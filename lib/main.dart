@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:todo/homeScreen.dart';
+import 'package:todo/HOUSE/homeScreen.dart';
+import 'package:todo/myTheme.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
       routes: {
         HomeScreen.routeName: (context) => HomeScreen(),
       },
+      theme: MyTheme.lightTheme,
     );
   }
 }
