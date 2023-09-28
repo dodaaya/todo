@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<Widget> tabs = [taskListTab(), settingsTab()];
+  List<Widget> tabs = [taskListTab(), SettingsTab()];
 
   void showaddTask() {
     showModalBottomSheet(
