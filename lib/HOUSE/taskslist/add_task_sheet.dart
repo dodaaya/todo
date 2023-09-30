@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:todo/firebase_utils.dart';
+import 'package:todo/model/task.dart';
+import 'package:todo/providers/app_config_provider.dart';
 
 class AddTaskSheet extends StatefulWidget {
   @override
@@ -8,9 +12,13 @@ class AddTaskSheet extends StatefulWidget {
 class _AddTaskSheetState extends State<AddTaskSheet> {
   DateTime selectedDate = DateTime.now();
   var formKey = GlobalKey<FormState>();
+  String title = '';
+  String description = '';
+  late AppConfigProvider listProvider;
 
   @override
   Widget build(BuildContext context) {
+    listProvider = Provider.of<AppConfigProvider>(context);
     return Container(
       padding: EdgeInsets.all(12),
       child: Column(
@@ -27,6 +35,9 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
+                      onChanged: (text) {
+                        title = text;
+                      },
                       validator: (text) {
                         if (text == null || text.isEmpty) {
                           return 'please enter task title';
@@ -39,6 +50,9 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
+                      onChanged: (text) {
+                        description = text;
+                      },
                       validator: (text) {
                         if (text == null || text.isEmpty) {
                           return 'please enter task description';
@@ -87,7 +101,7 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
   void showCalendar() async {
     var chosenDate = await showDatePicker(
         context: context,
-        initialDate: DateTime.now(),
+        initialDate: selectedDate,
         firstDate: DateTime.now(),
         lastDate: DateTime.now().add(Duration(days: 365)));
     if (chosenDate != null) {
@@ -97,6 +111,14 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
   }
 
   void addTask() {
-    if (formKey.currentState?.validate() == true) {}
+    if (formKey.currentState?.validate() == true) {
+      Task task =
+          Task(title: title, description: description, dateTime: selectedDate);
+      FirebaseUtils.addTaskToFireStore(task)
+          .timeout(Duration(milliseconds: 500), onTimeout: () {
+        listProvider.getTasksFromFs();
+        Navigator.pop(context);
+      });
+    }
   }
 }

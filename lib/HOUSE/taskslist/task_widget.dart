@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:todo/model/task.dart';
 import 'package:todo/myTheme.dart';
 
 class taskWidget extends StatelessWidget {
+  Task task;
+
+  taskWidget({required this.task});
+
   @override
   Widget build(BuildContext context) {
     return Slidable(
@@ -42,27 +47,27 @@ class taskWidget extends StatelessWidget {
               ),
               Expanded(
                   child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'task',
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          task.title ?? '',
                       style: Theme.of(context)
                           .textTheme
                           .titleSmall!
                           .copyWith(color: Theme.of(context).primaryColor),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'description',
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          task.description ?? '',
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
-                  ),
-                ],
-              )),
+                      ),
+                    ],
+                  )),
               Container(
                 padding: EdgeInsets.symmetric(vertical: 7, horizontal: 20),
                 decoration: BoxDecoration(
