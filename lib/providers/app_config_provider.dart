@@ -7,13 +7,28 @@ class AppConfigProvider extends ChangeNotifier {
   ThemeMode appTheme = ThemeMode.dark;
   String appLanguage = 'en';
   List<Task> tasksList = [];
+  DateTime selectDate = DateTime.now();
 
-  void getTasksFromFs() async {
+  void getTasksFromFs(String uId) async {
     QuerySnapshot<Task> querySnapshot =
-        await FirebaseUtils.getTasksCollection().get();
+        await FirebaseUtils.getTasksCollection(uId).get();
     tasksList = querySnapshot.docs.map((doc) {
       return doc.data();
     }).toList();
+
+    tasksList = tasksList.where((task) {
+      if (task.dateTime?.day == selectDate.day &&
+          task.dateTime?.month == selectDate.month &&
+          task.dateTime?.year == selectDate.year) {
+        return true;
+      }
+      return false;
+    }).toList();
+
+    tasksList.sort((Task task1, Task task2) {
+      return task1.dateTime!.compareTo(task2.dateTime!);
+    });
+
     notifyListeners();
   }
 
@@ -31,5 +46,10 @@ class AppConfigProvider extends ChangeNotifier {
     }
     appLanguage = newLanguage;
     notifyListeners();
+  }
+
+  void changeSelDate(DateTime newDate, String uId) {
+    selectDate = newDate;
+    getTasksFromFs(uId);
   }
 }

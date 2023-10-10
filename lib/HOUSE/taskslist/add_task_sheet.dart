@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo/Dia;ogue_utils.dart';
 import 'package:todo/firebase_utils.dart';
 import 'package:todo/model/task.dart';
 import 'package:todo/providers/app_config_provider.dart';
+import 'package:todo/providers/auth_provider.dart';
 
 class AddTaskSheet extends StatefulWidget {
   @override
@@ -101,7 +103,7 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
   void showCalendar() async {
     var chosenDate = await showDatePicker(
         context: context,
-        initialDate: selectedDate,
+        initialDate: selectedDate, //or DateTime.now()
         firstDate: DateTime.now(),
         lastDate: DateTime.now().add(Duration(days: 365)));
     if (chosenDate != null) {
@@ -114,9 +116,20 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
     if (formKey.currentState?.validate() == true) {
       Task task =
           Task(title: title, description: description, dateTime: selectedDate);
-      FirebaseUtils.addTaskToFireStore(task)
-          .timeout(Duration(milliseconds: 500), onTimeout: () {
-        listProvider.getTasksFromFs();
+
+      DialogueUtils.showLoading(context, 'loading...');
+      var authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      FirebaseUtils.addTaskToFireStore(task, authProvider.currentUser!.id!)
+          .then((value) {
+        DialogueUtils.hideLoading(context);
+        DialogueUtils.showMsg(context, 'task added successfully',
+            posActionName: 'ok', posAction: () {
+          Navigator.pop(context);
+        });
+      }).timeout(Duration(milliseconds: 500), onTimeout: () {
+        print('success');
+        listProvider.getTasksFromFs(authProvider.currentUser!.id!);
         Navigator.pop(context);
       });
     }
