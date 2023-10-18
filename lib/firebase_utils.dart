@@ -24,6 +24,16 @@ class FirebaseUtils {
     return getTasksCollection(uId).doc(task.id).delete();
   }
 
+  static Future<void> editIsDone(Task task, String uId) {
+    return getTasksCollection(uId)
+        .doc(task.id)
+        .update({'isDone': !task.isDone!});
+  }
+
+  static Future<void> editTask(Task task, String uId) {
+    return getTasksCollection(uId).doc(task.id).update(task.toFireStore());
+  }
+
   static CollectionReference<MyUser> getUsersCollection() {
     return FirebaseFirestore.instance
         .collection(MyUser.collectionName)
